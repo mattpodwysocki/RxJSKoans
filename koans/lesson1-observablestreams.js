@@ -6,21 +6,6 @@ module('Lesson 1 - Observable Streams');
  * Step 3: run it again
  * Note: Do not change anything other than the blank
  */
-
-var Range = {
-	create : function (start, count) {
-		var values = [];
-		for(var i = 0; i < count; i++) {
-			values.push(i + start);
-		}
-		
-		return values;
-	}
-}; 
-
-Array.prototype.toObservable = function() {
-	return Rx.Observable.FromArray(this);
-};
  
 test('SimpleSubscription', function() {
     Rx.Observable.Return(42).Subscribe(function(x) { equals(x, ___); });	
