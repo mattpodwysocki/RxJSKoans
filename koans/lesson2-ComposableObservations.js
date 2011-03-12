@@ -13,6 +13,21 @@ module('Lesson 2 - Composable Observations');
 	numbers.toObservable().Sum().Subscribe(function(x) { received = x; });
 	equals(received, 1110);
  });
+  
+ test('ComposeableBeforeAndAfter', function() {
+	var names = Range.create(1, 6),
+		a = '',
+		b = '';
+		
+	names.toObservable()
+		.Do(function(n) { a += n.toString(); })
+		.Where(function(n) { return n % 2 === 0; })
+		.Do(function(n) { b += n.toString(); })
+		.Subscribe();
+		
+	equals(a, ___);
+	equals(b, '246');
+ });
  
  test('WeWroteThis', function() {
 	var received = [];
@@ -26,6 +41,19 @@ module('Lesson 2 - Composable Observations');
 	var names = ['wE', 'hOpE', 'yOU', 'aRe', 'eNJoyIng', 'tHiS' ];
 	names.toObservable().Select(function(x) { return x.___; }).Subscribe(function(x) { received += x + ' '; });
 	equals(received, 'we hope you are enjoying this ');
+ });
+ 
+ test('CreatingAMoreRelevantEventStream', function() {
+	var received = '',
+		mouseXMovements = [100, 200, 150],
+		windowTopX = 50,
+		relativemouse = mouseXMovements.toObservable().Select(function(x) {
+			return x - ___;
+		});
+	relativemouse.Subscribe(function(x) {
+		received += x + ', ';
+	});
+	equals(received, '50, 150, 100, ');
  });
  
  test('CheckingEverything', function() {

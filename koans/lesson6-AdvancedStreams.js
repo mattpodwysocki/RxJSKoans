@@ -9,14 +9,14 @@ test('Merging', function() {
 		easy += a + ' ';
 	});
 	
-	equals('1 2 A 3 B C ', easy);
+	equals(___, easy);
 });
 
 test('Splitting Up', function() {
 	var oddsAndEvens = ['',''];
 		numbers = Rx.Observable.Range(1, 9),
 		split = numbers.GroupBy(function(n) {
-			return n % 2;
+			return ___;
 		});
 	split.Subscribe(function(group) {
 		group.Subscribe(function(n) { oddsAndEvens[group.Key] += n; });
@@ -34,7 +34,7 @@ test('Need To Subscribe Imediately When Splitting', function() {
 		numbers = [22,22,99,22,101,22].toObservable(),
 		split = numbers.GroupBy(function(n) { return n % 2; });
 	split.Subscribe(function(g) {
-		g.Average().Subscribe(function(a) { averages[g.Key] = a; });
+		g.Average().____(function(a) { averages[g.Key] = a; });
 	});
 	equals(averages[0], 22);
 	equals(averages[1], 100);
@@ -56,6 +56,6 @@ test('Multiple Subscriptions', function() {
 	numbers.OnNextAll(2, 2, 2, 2, 2);
 	numbers.OnCompleted();
 	equals(sum, 15);
-	equals(average, 2);
+	equals(average, ___);
 });
 
