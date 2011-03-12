@@ -40,3 +40,22 @@ test('Need To Subscribe Imediately When Splitting', function() {
 	equals(averages[1], 100);
 });
 
+test('Multiple Subscriptions', function() {
+	var numbers = new Rx.Subject(),
+		sum = 0,
+		average = 0;
+		
+	numbers.Sum().Subscribe(function(n) {
+		sum = n;
+	});
+	numbers.OnNextAll(1, 1, 1, 1, 1);
+	numbers.Average().Subscribe(function(n) {
+		average = n;
+		// Bug, not called?
+	});
+	numbers.OnNextAll(2, 2, 2, 2, 2);
+	numbers.OnCompleted();
+	equals(sum, 15);
+	equals(average, 2);
+});
+
