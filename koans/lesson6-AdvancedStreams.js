@@ -31,7 +31,7 @@ test('Splitting Up', function() {
 
 test('Need To Subscribe Imediately When Splitting', function() {
 	var averages = [0.0,0.0],
-		numbers - [22,22,99,22,101,22].toObservable(),
+		numbers = [22,22,99,22,101,22].toObservable(),
 		split = numbers.GroupBy(function(n) { return n % 2; });
 	split.Subscribe(function(g) {
 		g.Average().Subscribe(function(a) { averages[g.Key] = a; });
