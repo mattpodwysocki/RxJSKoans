@@ -43,6 +43,6 @@ test('NothingListensUntilYouSubscribe', function() {
 	var numbers = Range.create(1,10).toObservable();
 	var observable = numbers.Do(function(n) { sum += n; });
 	equals(0, sum);
-	observable.___();
-	equals(10*11/2,sum);	
+	observable.___();	
+	equals(1+2+3+4+5+6+7+8+9+10,·sum); 
 });

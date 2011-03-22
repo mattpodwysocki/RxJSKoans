@@ -7,9 +7,37 @@ module('Lesson 3 - Time');
  * Note: Do not change anything other than the blank
  */
 
-asyncTest('Wait for seconds', function() {
+asyncTest('LaunchingAnActionInTheFuture', function() {
 	var received = '';
 	var delay = ___;
 	Rx.Scheduler.Immediate.Schedule(function() { received = 'Finished'; }, delay);
 	setTimeout(function() { equals(received, 'Finished'); start(); }, 2000);
 });
+
+asyncTest('LaunchingAnEventInTheFuture', function() {
+	var received = '',
+		time = ___;
+		
+	Rx.Observable.Return('Godot', Rx.Scheduler.Immediate).Delay(time).Subscribe(function(x) {
+		received = x;
+	});
+	
+	setTimeout(function() { equals(received, 'Godot'); start(); }, 2000);
+});
+
+asyncTest('AWatchedPot', function() {
+	var received = '',
+		delay = 2000,
+		timeout = ___,
+		timeoutEvent = Rx.Observable.Return('Tepid');
+		
+	Rx.Observable.Return('Boiling')
+		.Delay(delay)
+		.Timeout(timeout, timeoutEvent)
+		.Subscribe(
+			function(x) {
+				received = x;
+			});
+	setTimeout(function() { equals(received, 'Boiling'); start(); }, 2000);
+});
+ 

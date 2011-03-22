@@ -32,7 +32,7 @@ module('Lesson 2 - Composable Observations');
  test('WeWroteThis', function() {
 	var received = [];
 	var names = ['Bart', 'Wes', 'Erik', 'Matthew'];
-	names.toObservable().Where(function(n) { return n.length < ___; }).Subscribe(function(x) { received.push(x); });
+	names.toObservable().Where(function(n) { return n.length <= ___; }).Subscribe(function(x) { received.push(x); });
 	equals(received.toString(), 'Bart,Wes,Erik');	
  });
  
