@@ -44,5 +44,5 @@ test('NothingListensUntilYouSubscribe', function() {
 	var observable = numbers.Do(function(n) { sum += n; });
 	equals(0, sum);
 	observable.___();	
-	equals(1+2+3+4+5+6+7+8+9+10,·sum); 
+	equals(1+2+3+4+5+6+7+8+9+10, sum); 
 });
