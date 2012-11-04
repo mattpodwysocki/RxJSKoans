@@ -8,16 +8,35 @@ test('Merging', function() {
     you
         .merge(me)
         .subscribe(function(a) { easy += a + ' '; });
+
     // Actually, this is not so easy! The result could be any arbitrary
     // riffle of the original two streams.  More later on Riffles in JS.
 
-    equals(easy, '1 A 2 B 3 C '/*_______*/);
-    equals(easy, '1 2 3 A B C '/*_______*/);
+    equals(easy == '1 A 2 B 3 C ' || easy == '1 2 3 A B C ', true/*_______*/);
+
+    // equals(easy, '1 2 3 A B C '/*_______*/);
+    // equals(easy, '1 A 2 B 3 C '/*_______*/);
 });
+
+
 
 test('Riffles', function() {
     var e = L2O.Enumerable.fromArray([1, 2, 3]);
+    var p = e.contains(2);
+    var c = e.count();
+
+    equals(p, true);
+    equals(c, 3);
+    equals(pluck(2)(e), 2);
 });
+
+var pluck = function (n) {
+    return function(xs) {
+        if (n < 0 || n >= xs.count)
+            throw new Error('index out of range');
+        return xs.elementAt(n - 1);
+    };
+};
 
 test('Splitting Up', function() {
     var oddsAndEvens = ['',''];
