@@ -15,6 +15,8 @@ test('Merging', function() {
     equals(easy, '1 2 3 A B C '/*_______*/);
 });
 
+test('Riffles', function() {});
+
 test('Splitting Up', function() {
     var oddsAndEvens = ['',''];
         numbers = Rx.Observable.range(1, 9),
