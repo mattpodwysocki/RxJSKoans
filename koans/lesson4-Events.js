@@ -29,5 +29,5 @@ test('listening to the right events', function() {
     $(document).trigger({ type: 'foo', payload : 'T'});
     subscription.Dispose();
     
-    equals(received, 'MATT'/*_______*/);
+    equals(received, 'MTT'/*_______*/);
 });
