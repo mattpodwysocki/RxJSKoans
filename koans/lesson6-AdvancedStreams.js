@@ -18,7 +18,11 @@ test('Merging', function() {
     // equals(easy, '1 A 2 B 3 C '/*_______*/);
 });
 
-
+var floatingEquals = function (a, b, digits) {
+    var exponent = Math.abs( digits || 12 );
+    var multiplier = Math.pow(10, exponent);
+    return Math.round( multiplier * a ) == Math.round( multiplier * b);
+};
 
 test('Riffles', function() {
     var e = L2O.Enumerable.fromArray([1, 2, 3]);
@@ -28,6 +32,22 @@ test('Riffles', function() {
     equals(p, true);
     equals(c, 3);
     equals(pluck(2)(e), 2);
+    equals(e.standardDeviation(), 1);
+
+    equals(floatingEquals(
+        L2O.Enumerable.fromArray([1, 2]).standardDeviation(),
+        1 / Math.sqrt(2)), true);
+
+    equals(floatingEquals(
+        L2O.Enumerable.fromArray([1, 2, 4]).standardDeviation(),
+        Math.sqrt(7 / 3)), true);
+
+    [1, 2, 4]
+        .toObservable()
+        .standardDeviation()
+        .subscribe(function (s) {
+            console.log(s);
+            equals(floatingEquals(s, Math.sqrt(7 / 3)), true); });
 });
 
 var pluck = function (n) {
