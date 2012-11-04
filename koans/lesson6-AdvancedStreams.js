@@ -11,7 +11,7 @@ test('Merging', function() {
     // Actually, this is not so easy! The result could be any arbitrary
     // riffle of the original two streams.  More later on Riffles in JS.
 
-    equals(easy, '1 A 2 B 3 C '/*_______*/);
+//    equals(easy, '1 A 2 B 3 C '/*_______*/);
     equals(easy, '1 2 3 A B C '/*_______*/);
 });
 
