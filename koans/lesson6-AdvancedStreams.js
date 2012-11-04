@@ -15,7 +15,9 @@ test('Merging', function() {
     equals(easy, '1 2 3 A B C '/*_______*/);
 });
 
-test('Riffles', function() {});
+test('Riffles', function() {
+    var e = [1, 2, 3].toEnumerable();
+});
 
 test('Splitting Up', function() {
     var oddsAndEvens = ['',''];
