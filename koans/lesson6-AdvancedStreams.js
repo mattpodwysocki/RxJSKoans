@@ -16,7 +16,7 @@ test('Merging', function() {
 });
 
 test('Riffles', function() {
-    var e = [1, 2, 3].toEnumerable();
+    var e = L2O.Enumerable.fromArray([1, 2, 3]);
 });
 
 test('Splitting Up', function() {

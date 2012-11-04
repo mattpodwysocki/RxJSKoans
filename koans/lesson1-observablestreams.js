@@ -7,6 +7,15 @@ module('Lesson 1 - Observable Streams');
  * Note: Do not change anything other than the blank
  */
  
+test('ObjectsFirst', function () {
+    var xs = L2O.Enumerable.fromArray([1, 2, 3]);
+    equals(xs.first(), 1/*_______*/);
+
+    var itsOk = L2O.Enumerable
+        .returnValue(42);
+    equals(itsOk.first(), 42 /*_______*/);
+});
+
 test('SimpleSubscription', function() {
     Rx.Observable
         .returnValue(42)
