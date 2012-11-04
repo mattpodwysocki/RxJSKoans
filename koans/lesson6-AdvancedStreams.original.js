@@ -9,7 +9,7 @@ test('Merging', function() {
         .Merge(me)
         .Subscribe(function(a) { easy += a + ' '; });
     
-    equals('1 2 A 3 B C '/*_______*/, easy);
+    equals(_______, easy);
 });
 
 test('Splitting Up', function() {
