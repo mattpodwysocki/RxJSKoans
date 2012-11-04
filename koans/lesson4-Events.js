@@ -5,12 +5,12 @@ test('listening to events', function() {
     var subscription =
         $(document)
             .toObservable('foo')
-            .Subscribe(function(e) { received += e.payload; });
+            .subscribe(function(e) { received += e.payload; });
     
     $(document).trigger({ type: 'foo', payload : 'M'});
     $(document).trigger({ type: 'foo', payload : 'A'});
     $(document).trigger({ type: 'foo', payload : 'T'});
-    subscription.Dispose();
+    subscription.dispose();
     $(document).trigger({ type: 'foo', payload : 'T'});
     
     equals(received, 'MAT'/*_______*/);
@@ -21,13 +21,13 @@ test('listening to the right events', function() {
     var subscription =
         $(document)
             .toObservable('foo')
-            .Subscribe(function(e) { received += e.payload; });
+            .subscribe(function(e) { received += e.payload; });
     
     $(document).trigger({ type: 'foo', payload : 'M'});
     $(document).trigger({ type: 'bar', payload : 'A'});
     $(document).trigger({ type: 'foo', payload : 'T'});
     $(document).trigger({ type: 'foo', payload : 'T'});
-    subscription.Dispose();
+    subscription.dispose();
     
     equals(received, 'MTT'/*_______*/);
 });

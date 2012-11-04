@@ -6,42 +6,56 @@ test('Merging', function() {
         me = ['A','B','C'].toObservable();
         
     you
-        .Merge(me)
-        .Subscribe(function(a) { easy += a + ' '; });
-    /* Actually, this is not so easy! The result could be any arbitrary
-     * riffle of the original two streams.  More later on Riffles in JS.
-     */
-    equals('1 2 A 3 B C '/*_______*/, easy);
+        .merge(me)
+        .subscribe(function(a) { easy += a + ' '; });
+    // Actually, this is not so easy! The result could be any arbitrary
+    // riffle of the original two streams.  More later on Riffles in JS.
+
+    equals(easy, '1 A 2 B 3 C '/*_______*/);
+    equals(easy, '1 2 3 A B C '/*_______*/);
 });
 
 test('Splitting Up', function() {
     var oddsAndEvens = ['',''];
-        numbers = Rx.Observable.Range(1, 9),
-        split = numbers.GroupBy(function(n) { return n % 2 /*_______*/; });
+        numbers = Rx.Observable.range(1, 9),
+        split = numbers
+            .groupBy(function(n) { return n % 2 /*_______*/; });
+
+    split.subscribe(function (g) {
+        console.log(g, "key: ", g.key);
+        return g.subscribe(
+            function (i) {
+                return console.log(i);
+            });
+        });
+
     split
-        .Subscribe(function(group) {
+        .subscribe(function(group) {
             group
-                .Subscribe(function(n) { oddsAndEvens[group.Key] += n; });
+                .subscribe(function(n) { oddsAndEvens[group.key] += n; });
     });
     
     var evens = oddsAndEvens[0],
         odds = oddsAndEvens[1];
         
-    equals('2468', evens);
-    equal('13579', odds);
+    equals(evens, '2468');
+    equal(odds, '13579');
 });
+
 
 test('Subscribe Imediately When Splitting', function() {
     var averages = [0.0,0.0],
         numbers = [22,22,99,22,101,22].toObservable(),
         split = numbers
-        .GroupBy(function(n) { return n % 2; });
+        .groupBy(function(n) { return n % 2; });
     split
-        .Subscribe(function(g) {
-        g.Average().Subscribe/*_______*/(function(a) { averages[g.Key] = a; });
+        .subscribe(function(g) {
+            g
+                .average()
+                .subscribe/*_______*/(function(a) { averages[g.key] = a; });
     });
-    equals(averages[0], 22);
-    equals(averages[1], 100);
+    equals(22, averages[0]);
+    equals(100, averages[1]);
 });
 
 test('Multiple Subscriptions', function() {
@@ -50,20 +64,30 @@ test('Multiple Subscriptions', function() {
         average = 0;
         
     numbers
-        .Sum()
-        .Subscribe(function(n) { sum = n; });
-    numbers
-        .OnNextAll(1, 1, 1, 1, 1);
+        .sum()
+        .subscribe(function(n) { sum = n; });
+    numbers.onNext(1);
+    numbers.onNext(1);
+    numbers.onNext(1);
+    numbers.onNext(1);
+    numbers.onNext(1);
     
     numbers
-        .Average()
-        .Subscribe(function(n) {
+        .average()
+        .subscribe(function(n) {
             average = n;
             // Bug, not called?
         });
-    numbers.OnNextAll(2, 2, 2, 2, 2);
-    numbers.OnCompleted();
+    numbers.onNext(2);
+    numbers.onNext(2);
+    numbers.onNext(2);
+    numbers.onNext(2);
+    numbers.onNext(2);
+
+    numbers.onCompleted();
+
     equals(sum, 15);
     equals(average, 2/*_______*/);
 });
+
 

@@ -9,52 +9,59 @@ module('Lesson 1 - Observable Streams');
  
 test('SimpleSubscription', function() {
     Rx.Observable
-        .Return(42)
-        .Subscribe(function(x) { equals(x, 42 /*_______*/); });	
+        .returnValue(42)
+        .subscribe(function(x) { equals(x, 42 /*_______*/); });	
 });
 
 test('SimpleReturn', function() {
     var received = '';
     Rx.Observable
-        .Return('Foo')
-        .Subscribe(function(x) { received = x; });
-    equals('Foo'/*_______*/, received);
+        .returnValue('Foo')
+        .subscribe(function(x) { received = x; });
+    equals(received, 'Foo'/*_______*/);
 });
 
 test('TheLastEvent', function() {
     var received = '';
     var numbers = ['Foo','Bar'];
     Rx.Observable
-        .FromArray(numbers)
-        .Subscribe(function(x) { received = x; });
-    equals('Bar'/*_______*/, received);
+        .fromArray(numbers)
+        .subscribe(function(x) { received = x; });
+    equals(received, 'Bar'/*_______*/);
 });
 
 test('EveryThingCounts', function() {
     var received = 0;
     var numbers = [3, 4 ];
     Rx.Observable
-        .FromArray(numbers)
-        .Subscribe(function(x) { received += x; });
-    equals(7/*_______*/, received);	
+        .fromArray(numbers)
+        .subscribe(function(x) { received += x; });
+    equals(received, 7/*_______*/);	
 });
 
 test('DoingInTheMiddle', function() {
     var status = [];
     var daysTillTest = Range.create(1, 4).reverse().toObservable();
     daysTillTest
-        .Do(function(d) { status.push(
-            d + '=' + (d === 1 ? 'Study Like Mad' : 'Party'/*_______*/)); })
-            .Subscribe();
-	equals('4=Party,3=Party,2=Party,1=Study Like Mad', status.toString());
+        .doAction(
+            function(d) { status.push(
+                d + '=' + (d === 1 ? 'Study Like Mad' : 'Party'/*_______*/));
+            })
+        .subscribe();
+	equals(
+            status.toString(),
+            '4=Party,3=Party,2=Party,1=Study Like Mad');
 });
 
 test('NothingListensUntilYouSubscribe', function() {
     var sum = 0;
     var numbers = Range.create(1,10).toObservable();
     var observable = numbers
-        .Do(function(n) { sum += n; });
+        .doAction(function(n) { sum += n; });
+
     equals(0, sum);
-    observable.Subscribe/*_______*/();	
+    
+    observable.subscribe/*_______*/();	
+
     equals(55, sum); 
 });

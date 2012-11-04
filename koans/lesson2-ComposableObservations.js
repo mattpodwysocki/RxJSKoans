@@ -12,8 +12,8 @@ test('ComposableAddition', function() {
     var numbers = [10, 100, 1000/*_______*/];
     numbers
         .toObservable()
-        .Sum()
-        .Subscribe(function(x) { received = x; });
+        .sum()
+        .subscribe(function(x) { received = x; });
     equals(received, 1110);
 });
   
@@ -23,21 +23,21 @@ test('ComposableAddition', function() {
         b = '';
     names
         .toObservable()
-        .Do(function(n) { a += n.toString(); })
-        .Where(function(n) { return n % 2 === 0; })
-        .Do(function(n) { b += n.toString(); })
-        .Subscribe();
+        .doAction(function(n) { a += n.toString(); })
+        .where(function(n) { return n % 2 === 0; })
+        .doAction(function(n) { b += n.toString(); })
+        .subscribe();
     equals(a, '123456'/*_______*/);
     equals(b, '246');
 });
  
 test('WeWroteThis', function() {
     var received = [];
-    var names = ['Bart', 'Wes', 'Erik', 'Matthew'];
+    var names = ['Bart', 'Wes', 'Erik', 'Matthew', 'Brian'];
     names
         .toObservable()
-        .Where(function(n) { return n.length <= 4/*_______*/; })
-        .Subscribe(function(x) { received.push(x); });
+        .where(function(n) { return n.length <= 4/*_______*/; })
+        .subscribe(function(x) { received.push(x); });
     equals(received.toString(), 'Bart,Wes,Erik');    
 });
  
@@ -46,8 +46,8 @@ test('ConvertingEvents', function() {
     var names = ['wE', 'hOpE', 'yOU', 'aRe', 'eNJoyIng', 'tHiS' ];
     names
         .toObservable()
-        .Select(function(x) { return x.toLowerCase()/*_______*/; })
-        .Subscribe(function(x) { received += x + ' '; });
+        .select(function(x) { return x.toLowerCase()/*_______*/; })
+        .subscribe(function(x) { received += x + ' '; });
     equals(received, 'we hope you are enjoying this ');
 });
  
@@ -57,12 +57,9 @@ test('CreatingAMoreRelevantEventStream', function() {
         windowTopX = 50,
         relativemouse = mouseXMovements
             .toObservable()
-            .Select(function(x) {
-                return x - windowTopX/*_______*/;
-            });
-    relativemouse.Subscribe(function(x) {
-        received += x + ', ';
-    });
+            .select(function(x) { return x - windowTopX/*_______*/; });
+    
+    relativemouse.subscribe(function(x) { received += x + ', '; });
     equals(received, '50, 150, 100, ');
 });
  
@@ -71,15 +68,15 @@ test('CheckingEverything', function() {
     var numbers = [ 2, 4, 6, 8 ];
     numbers
         .toObservable()
-        .All(function(x) { return x % 2 === 0; })
-        .Subscribe(function(x) { received = x; });
+        .all(function(x) { return x % 2 === 0; })
+        .subscribe(function(x) { received = x; });
     equals(received, true/*_______*/);
 });
  
 test('CompositionMeansTheSumIsGreaterThanTheParts', function() {
-    var numbers = Rx.Observable.Range(1, 10);
+    var numbers = Rx.Observable.range(1, 10);
     numbers
-        .Where(function(x) { return x > 8/*_______*/; })
-        .Sum()
-        .Subscribe(function(x) { equals(19, x); });
+        .where(function(x) { return x > 8/*_______*/; })
+        .sum()
+        .subscribe(function(x) { equals(19, x); });
  });
