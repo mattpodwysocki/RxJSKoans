@@ -1,21 +1,30 @@
 module('Lesson 6 - Advanced Streams');
 
 test('Merging', function() {
-    var easy = '',
+    var easy = [],
         you = [1,2,3].toObservable(),
         me = ['A','B','C'].toObservable();
-        
     you
         .merge(me)
-        .subscribe(function(a) { easy += a + ' '; });
+        .subscribe(function(a) { easy.push(a); });
 
+    // equals(easy === '1 A 2 B 3 C ' || easy === '1 2 3 A B C ', true/*_______*/);
+    
     // Actually, this is not so easy! The result could be any arbitrary
     // riffle of the original two streams.  More later on Riffles in JS.
 
-    equals(easy === '1 A 2 B 3 C ' || easy === '1 2 3 A B C ', true/*_______*/);
+    riffles([1, 2, 3].toEnumerable(), ['A', 'B', 'C'].toEnumerable())
+        .forEach(function(riffle) {
+            console.log("riffle: ", riffle.toArray());
+        });
+    console.log("easy: ", easy);
 
-    // equals(easy, '1 2 3 A B C '/*_______*/);
-    // equals(easy, '1 A 2 B 3 C '/*_______*/);
+    equals( riffles([1, 2, 3].toEnumerable(), ['A', 'B', 'C'].toEnumerable())
+        .select(function (riffle) {return riffle.toArray();})
+        .contains(easy, arrayComparer),
+        true);
+
+
 });
 
 // Given a 1-based index n, produces a function that will pluck the n-th
@@ -80,7 +89,10 @@ var splits = function(xs) {
     var c = xs.count();
     var ys = [];
     for (var i = 0; i <= c; i++)
-        ys.push( [xs.take(i), xs.skip(i)].toEnumerable() );
+        // ys.push( [xs.take(i), xs.skip(i)].toEnumerable() );
+        ys.push( [xs.take(i).toArray().slice(0).toEnumerable(),
+                  xs.skip(i).toArray().slice(0).toEnumerable()]
+             .toEnumerable() );
     return ys.toEnumerable();
 };
 
@@ -91,39 +103,18 @@ var riffles = function(left, right) {
         return Ix.Enumerable.returnValue(right);
     if (right.count() === 0)
         return Ix.Enumerable.returnValue(left);
-    ys = [];
+    var ys = [];
     
-    // console.log(right.toArray());
-    // console.log(right.skip(1).toArray());
-    // console.log(right.skip(1).take(1).toArray());
-
-    // console.log("s1: ", splits(right).skip(1).take(1).toArray());
-    
-    splits(right).skip(1).take(1).forEach( function(r) {
-        splits(left).forEach( function(l) {
-            console.log("lfst: ", l.first().toArray());
-            console.log("lea1: ", l.elementAt(1).toArray());
-            console.log("rfst: ", r.first().toArray());
-            console.log("rea1: ", r.elementAt(1).toArray());
-            console.log("riff: ", riffles(l.elementAt(1), r.elementAt(1)));
-            riffles(l.elementAt(1), r.elementAt(1)).forEach( function(f) {
-                console.log(l.first().concat(r.first()).concat(f).toArray());
-                ys.push(l.first().concat(r.first()).concat(f));
-            });
-        });
-    });
+    splits(right).skip(1).take(1).forEach( function(r) 
+    {   splits(left).forEach( function(l) 
+        {   riffles(l.elementAt(1), r.elementAt(1)).forEach( function(f) 
+            {   ys.push(l.first().concat(r.first()).concat(f));
+    }); }); });
 
     return ys.toEnumerable();                                           
 };
 
 test('Riffles', function() {
-    // riffles([].toEnumerable(), [].toEnumerable());
-    // riffles([1].toEnumerable(), [].toEnumerable());
-    // riffles([].toEnumerable(), [4].toEnumerable());
-    // riffles([1].toEnumerable(), [4].toEnumerable());
-    riffles([1, 2].toEnumerable(), [4, 5].toEnumerable());
-    //riffles([1, 2, 3].toEnumerable(), [4].toEnumerable());
-
     var e = [1, 2, 3].toEnumerable();
 
     equals(e.contains(2), true);
@@ -148,8 +139,10 @@ test('Riffles', function() {
                           e.toArray()), true);
     equals( arrayComparer(riffles(Ix.Enumerable.empty(), e).first().toArray(),
                           e.toArray()), true);
-    //equals( riffles([1,2,3].toEnumerable(), [4,5,6].toEnumerable())
-      //  .contains([1,2,4,5,3,6].toEnumerable), true);
+    equals( riffles([1,2,3].toEnumerable(), [4,5,6].toEnumerable())
+        .select(function (riffle) {return riffle.toArray();})
+        .contains([1,2,4,5,3,6], arrayComparer),
+        true);
 });
 
 var floatingEquals = function (a, b, digits) {
