@@ -8,36 +8,44 @@ module('Lesson 3 - Time');
  */
 
 asyncTest('LaunchingAnActionInTheFuture', function() {
-	var received = '';
-	var delay = ___;
-	Rx.Scheduler.Immediate.Schedule(function() { received = 'Finished'; }, delay);
-	setTimeout(function() { equals(received, 'Finished'); start(); }, 2000);
+    var received = '';
+    var delay = 250/*_______*/;
+    Rx
+        .Scheduler
+        .immediate
+        .schedule(function() { received = 'Finished'; }, delay);
+
+    setTimeout(function() { equals(received, 'Finished'); start(); }, 500);
 });
 
 asyncTest('LaunchingAnEventInTheFuture', function() {
-	var received = '',
-		time = ___;
-		
-	Rx.Observable.Return('Godot', Rx.Scheduler.Immediate).Delay(time).Subscribe(function(x) {
-		received = x;
-	});
-	
-	setTimeout(function() { equals(received, 'Godot'); start(); }, 2000);
+    var received = '',
+        time = 250/*_______*/;
+        
+    Rx
+        .Observable
+        .returnValue('Godot', Rx.Scheduler.Immediate)
+        .delay(time)
+        .subscribe(function(x) { received = x; });
+    
+    setTimeout(function() { equals(received, 'Godot'); start(); }, 500);
 });
 
 asyncTest('AWatchedPot', function() {
-	var received = '',
-		delay = 2000,
-		timeout = ___,
-		timeoutEvent = Rx.Observable.Return('Tepid');
-		
-	Rx.Observable.Return('Boiling')
-		.Delay(delay)
-		.Timeout(timeout, timeoutEvent)
-		.Subscribe(
-			function(x) {
-				received = x;
-			});
-	setTimeout(function() { equals(received, 'Boiling'); start(); }, 2000);
+    var received = '',
+        delay = 500,
+        timeout = 650/*_______*/,
+        timeoutEvent =
+            Rx  .Observable
+                .returnValue('Tepid');
+        
+    Rx
+        .Observable
+        .returnValue('Boiling')
+        .delay(delay)
+        .timeout(timeout, timeoutEvent)
+        .subscribe(function(x) { received = x; });
+    
+    setTimeout(function() { equals(received, 'Boiling'); start(); }, 500);
 });
  
