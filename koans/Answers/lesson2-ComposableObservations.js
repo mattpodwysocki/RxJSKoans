@@ -9,7 +9,7 @@ module('Lesson 2 - Composable Observations');
  
 test('ComposableAddition', function() {
     var received = 0;
-    var numbers = [10, 100, _______];
+    var numbers = [10, 100, 1000/*_______*/];
     numbers
         .toObservable()
         .sum()
@@ -27,7 +27,7 @@ test('ComposableAddition', function() {
         .where(function(n) { return n % 2 === 0; })
         .doAction(function(n) { b += n.toString(); })
         .subscribe();
-    equals(a, _______);
+    equals(a, '123456'/*_______*/);
     equals(b, '246');
 });
  
@@ -36,7 +36,7 @@ test('WeWroteThis', function() {
     var names = ['Bart', 'Wes', 'Erik', 'Matthew', 'Brian'];
     names
         .toObservable()
-        .where(function(n) { return n.length <= _______; })
+        .where(function(n) { return n.length <= 4/*_______*/; })
         .subscribe(function(x) { received.push(x); });
     equals(received.toString(), 'Bart,Wes,Erik');    
 });
@@ -46,7 +46,7 @@ test('ConvertingEvents', function() {
     var names = ['wE', 'hOpE', 'yOU', 'aRe', 'eNJoyIng', 'tHiS' ];
     names
         .toObservable()
-        .select(function(x) { return x._______; })
+        .select(function(x) { return x.toLowerCase()/*_______*/; })
         .subscribe(function(x) { received += x + ' '; });
     equals(received, 'we hope you are enjoying this ');
 });
@@ -57,7 +57,7 @@ test('CreatingAMoreRelevantEventStream', function() {
         windowTopX = 50,
         relativemouse = mouseXMovements
             .toObservable()
-            .select(function(x) { return x - _______; });
+            .select(function(x) { return x - windowTopX/*_______*/; });
     
     relativemouse.subscribe(function(x) { received += x + ', '; });
     equals(received, '50, 150, 100, ');
@@ -70,13 +70,13 @@ test('CheckingEverything', function() {
         .toObservable()
         .all(function(x) { return x % 2 === 0; })
         .subscribe(function(x) { received = x; });
-    equals(received, _______);
+    equals(received, true/*_______*/);
 });
  
 test('CompositionMeansTheSumIsGreaterThanTheParts', function() {
     var numbers = Rx.Observable.range(1, 10);
     numbers
-        .where(function(x) { return x > _______; })
+        .where(function(x) { return x > 8/*_______*/; })
         .sum()
         .subscribe(function(x) { equals(19, x); });
  });

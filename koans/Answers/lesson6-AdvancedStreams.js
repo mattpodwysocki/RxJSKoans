@@ -8,28 +8,65 @@ test('Merging', function() {
         .merge(me)
         .subscribe(function(a) { easy.push(a); });
 
-    // equals(easy === '1 A 2 B 3 C ' || easy === '1 2 3 A B C ', _______);
+    // equals(easy === '1 A 2 B 3 C ' || easy === '1 2 3 A B C ', true/*_______*/);
     
     // Actually, this is not so easy! The result could be any arbitrary
-    // riffle of the original two streams.  
+    // riffle of the original two streams.  More later on Riffles in JS.
 
     riffles([1, 2, 3].toEnumerable(), ['A', 'B', 'C'].toEnumerable())
         .forEach(function(riffle) {
             console.log("riffle: ", riffle.toArray());
         });
-    
     console.log("easy: ", easy);
 
-    equals(
-        riffles([1, 2, 3].toEnumerable(), ['A', 'B', 'C'].toEnumerable())
+    equals( riffles([1, 2, 3].toEnumerable(), ['A', 'B', 'C'].toEnumerable())
         .select(function (riffle) {return riffle.toArray();})
-        ._______(easy, arrayComparer),
+        .contains(easy, arrayComparer),
         true);
+
+
 });
+
+// Given a 1-based index n, produces a function that will pluck the n-th
+// item from any Enumerable and return it. Pluck produces a function so
+// that it can be mapped over Enumerables of Enumerables, say to produce
+// a columnar slice from an array.  WARNING: these are 1-based indices!
+var pluck = function (n) {
+    return function(xs) {
+        if (n <= 0 || n > xs.count)
+            throw new Error('index out of range');
+        return xs.elementAt(n - 1);
+    };
+};
+
+// Given a 1-based index n, produces a function that will produce an 
+// Enumerable with the n-th item missing.  WARNING: these are 1-based
+// indices!
+var coPluck = function(n) {
+    return function(xs) {
+
+        // is the following error-checking redundant?  The error-handling 
+        // policy of Ix is not clear to me at this point! (4 Nov 12)
+
+        // if (! (xs instanceof Ix.Enumerable) )
+        //     throw new Error('xs must be an Ix.Enumerable');
+        var c = xs.count();
+        if (n <= 0 || n > c)
+            throw new Error('index out of range');
+        var ys = [];
+        var i = 1;
+        xs.forEach( function (x) {
+            if (i != n)
+                ys.push(x);
+            i++;
+        });
+        return ys.toEnumerable();
+    };
+};    
 
 // A function that compares arrays for equality given an optional
 // elementComparer. Be aware that this is not sufficiently flexible 
-// to work on arrays of arbitrary nesting.
+// to work on arrayw of arbitrary nesting.
 var arrayComparer = function (xs, ys, elementComparer) {
     if ( (! (xs instanceof Array)) || (! (ys instanceof Array)) )
         return false;
@@ -52,7 +89,10 @@ var splits = function(xs) {
     var c = xs.count();
     var ys = [];
     for (var i = 0; i <= c; i++)
-        ys.push( [xs.take(i), xs.skip(i)].toEnumerable() );
+        // ys.push( [xs.take(i), xs.skip(i)].toEnumerable() );
+        ys.push( [xs.take(i).toArray().slice(0).toEnumerable(),
+                  xs.skip(i).toArray().slice(0).toEnumerable()]
+             .toEnumerable() );
     return ys.toEnumerable();
 };
 
@@ -74,6 +114,37 @@ var riffles = function(left, right) {
     return ys.toEnumerable();                                           
 };
 
+test('Riffles', function() {
+    var e = [1, 2, 3].toEnumerable();
+
+    equals(e.contains(2), true);
+    equals(e.count(), 3);
+    equals([[1, 2], [3, 4]].toEnumerable().contains([3, 4], arrayComparer), true);
+
+    e.forEach(function (x) { equals( pluck(x)(e), x ); });
+    
+    // Expecting exceptions to be thrown
+    try { pluck(0)(e); equals(false, true); }
+    catch (exception) { equals(true, true); }
+
+    try { pluck(4)(e); equals(false, true); }
+    catch (exception) { equals(true, true); }
+    
+    try { pluck(-2)(e); equals(false, true); }
+    catch (exception) { equals(true, true); }
+
+    equals( arrayComparer(coPluck(2)(e).toArray(), [1, 3]), true );
+
+    equals( arrayComparer(riffles(e, Ix.Enumerable.empty()).first().toArray(),
+                          e.toArray()), true);
+    equals( arrayComparer(riffles(Ix.Enumerable.empty(), e).first().toArray(),
+                          e.toArray()), true);
+    equals( riffles([1,2,3].toEnumerable(), [4,5,6].toEnumerable())
+        .select(function (riffle) {return riffle.toArray();})
+        .contains([1,2,4,5,3,6], arrayComparer),
+        true);
+});
+
 var floatingEquals = function (a, b, digits) {
     var exponent = Math.abs( digits || 12 );
     var multiplier = Math.pow(10, exponent);
@@ -82,7 +153,7 @@ var floatingEquals = function (a, b, digits) {
 
 test('DescriptiveStatistics', function () {
     var e = [1, 2, 3].toEnumerable();
-    equals(e.standardDeviation(), _______);
+    equals(e.standardDeviation(), 1);
 
     equals(floatingEquals(
         [1, 2].toEnumerable().standardDeviation(),
@@ -114,12 +185,12 @@ test('Splitting Up', function() {
     var oddsAndEvens = ['',''];
         numbers = Rx.Observable.range(1, 9),
         split = numbers
-            .groupBy(function(n) { return n % _______; });
+            .groupBy(function(n) { return n % 2 /*_______*/; });
 
     split.subscribe(function (g) {
         return g.subscribe(
             function (i) {
-                return console.log(i, g.key, g);
+                return console.log(i, g.key);
             });
         });
 
@@ -146,7 +217,7 @@ test('Subscribe Imediately When Splitting', function() {
         .subscribe(function(g) {
             g
                 .average()
-                ._______(function(a) { averages[g.key] = a; });
+                .subscribe/*_______*/(function(a) { averages[g.key] = a; });
     });
     equals(22, averages[0]);
     equals(100, averages[1]);
@@ -181,62 +252,7 @@ test('Multiple Subscriptions', function() {
     numbers.onCompleted();
 
     equals(sum, 15);
-    equals(average, _______);
+    equals(average, 2/*_______*/);
 });
-
-test('Tally', function()
-{   
-var alice = [
-"Alice", "was", "beginning", "to", "get", "very", "tired", "of", "sitting", "by", "her", "sister", "on", "the",
-"bank", "and", "of", "having", "nothing", "to", "do", "once", "or", "twice", "she", "had", "peeped", "into", "the",
-"book", "her", "sister", "was", "reading", "but", "it", "had", "no", "pictures", "or", "conversations", "in",
-"it", "and", "what", "is", "the", "use", "of", "a", "book", "thought", "Alice", "without", "pictures", "or",
-"conversation",
-"So", "she", "was", "considering", "in", "her", "own", "mind", "as", "well", "as", "she", "could", "for", "the",
-"hot", "day", "made", "her", "feel", "very", "sleepy", "and", "stupid", "whether", "the", "pleasure",
-"of", "making", "a", "daisy", "chain", "would", "be", "worth", "the", "trouble", "of", "getting", "up", "and",
-"picking", "the", "daisies", "when", "suddenly", "a", "White", "Rabbit", "with", "pink", "eyes", "ran",
-"close", "by", "her",
-
-"There", "was", "nothing", "so", "VERY", "remarkable", "in", "that", "nor", "did", "Alice", "think", "it", "so",
-"VERY", "much", "out", "of", "the", "way", "to", "hear", "the", "Rabbit", "say", "to", "itself", "Oh", "dear",
-"Oh", "dear", "I", "shall", "be", "late", "when", "she", "thought", "it", "over", "afterwards", "it",
-"occurred", "to", "her", "that", "she", "ought", "to", "have", "wondered", "at", "this", "but", "at", "the", "time",
-"it", "all", "seemed", "quite", "natural", "but", "when", "the", "Rabbit", "actually", "TOOK", "A", "WATCH",
-"OUT", "OF", "ITS", "WAISTCOAT", "POCKET", "and", "looked", "at", "it", "and", "then", "hurried", "on",
-"Alice", "started", "to", "her", "feet", "for", "it", "flashed", "across", "her", "mind", "that", "she", "had",
-"never", "before", "seen", "a", "rabbit", "with", "either", "a", "waistcoat", "pocket", "or", "a", "watch",
-"to", "take", "out", "of", "it", "and", "burning", "with", "curiosity", "she", "ran", "across", "the", "field",
-"after", "it", "and", "fortunately", "was", "just", "in", "time", "to", "see", "it", "pop", "down", "a", "large",
-"rabbit", "hole", "under", "the", "hedge",
-
-"In", "another", "moment", "down", "went", "Alice", "after", "it", "never", "once", "considering", "how",
-"in", "the", "world", "she", "was", "to", "get", "out", "again",
-
-"The", "rabbit", "hole", "went", "straight", "on", "like", "a", "tunnel", "for", "some", "way", "and", "then",
-"dipped", "suddenly", "down", "so", "suddenly", "that", "Alice", "had", "not", "a", "moment", "to", "think",
-"about", "stopping", "herself", "before", "she", "found", "herself", "falling", "down", "a", "very", "deep",
-"well",
-
-"Either", "the", "well", "was", "very", "deep", "or", "she", "fell", "very", "slowly", "for", "she", "had",
-"plenty", "of", "time", "as", "she", "went", "down", "to", "look", "about", "her", "and", "to", "wonder", "what", "was",
-"going", "to", "happen", "next", "First", "she", "tried", "to", "look", "down", "and", "make", "out", "what",
-"she", "was", "coming", "to", "but", "it", "was", "too", "dark", "to", "see", "anything", "then", "she",
-"looked", "at", "the", "sides", "of", "the", "well", "and", "noticed", "that", "they", "were", "filled", "with",
-"cupboards", "and", "book", "shelves", "here", "and", "there", "she", "saw", "maps", "and", "pictures",
-"hung", "upon", "pegs", "She", "took", "down", "a", "jar", "from", "one", "of", "the", "shelves", "as",
-"she", "passed", "it", "was", "labelled", "ORANGE", "MARMALADE", "but", "to", "her", "great",
-"disappointment", "it", "was", "empty", "she", "did", "not", "like", "to", "drop", "the", "jar", "for", "fear",
-"of", "killing", "somebody", "so", "managed", "to", "put", "it", "into", "one", "of", "the", "cupboards", "as",
-"she", "fell", "past", "it"
-];
-
-    alice
-        .toObservable()
-        .select(function(s) {return s.toLowerCase();})
-        .tally()
-        .subscribe(function (s) {console.log(s);})
-        ;
-    });
 
 
