@@ -9,17 +9,17 @@ module('Lesson 1 - Observable Streams');
  
 test('ObjectsFirst', function () {
     var xs = L2O.Enumerable.fromArray([1, 2, 3]);
-    equals(xs.first(), 1/*_______*/);
+    equals(xs.first(), _______);
 
     var itsOk = L2O.Enumerable
         .returnValue(42);
-    equals(itsOk.first(), 42 /*_______*/);
+    equals(itsOk.first(), _______);
 });
 
 test('SimpleSubscription', function() {
     Rx.Observable
         .returnValue(42)
-        .subscribe(function(x) { equals(x, 42 /*_______*/); });	
+        .subscribe(function(x) { equals(x, _______); });	
 });
 
 test('SimpleReturn', function() {
@@ -27,7 +27,7 @@ test('SimpleReturn', function() {
     Rx.Observable
         .returnValue('Foo')
         .subscribe(function(x) { received = x; });
-    equals(received, 'Foo'/*_______*/);
+    equals(received, _______);
 });
 
 test('TheLastEvent', function() {
@@ -36,7 +36,7 @@ test('TheLastEvent', function() {
     Rx.Observable
         .fromArray(numbers)
         .subscribe(function(x) { received = x; });
-    equals(received, 'Bar'/*_______*/);
+    equals(received, _______);
 });
 
 test('EveryThingCounts', function() {
@@ -45,7 +45,7 @@ test('EveryThingCounts', function() {
     Rx.Observable
         .fromArray(numbers)
         .subscribe(function(x) { received += x; });
-    equals(received, 7/*_______*/);	
+    equals(received, _______);	
 });
 
 test('DoingInTheMiddle', function() {
@@ -54,7 +54,7 @@ test('DoingInTheMiddle', function() {
     daysTillTest
         .doAction(
             function(d) { status.push(
-                d + '=' + (d === 1 ? 'Study Like Mad' : 'Party'/*_______*/));
+                d + '=' + (d === 1 ? 'Study Like Mad' : _______));
             })
         .subscribe();
 	equals(
@@ -70,7 +70,7 @@ test('NothingListensUntilYouSubscribe', function() {
 
     equals(0, sum);
     
-    observable.subscribe/*_______*/();	
+    observable._______();	
 
     equals(55, sum); 
 });

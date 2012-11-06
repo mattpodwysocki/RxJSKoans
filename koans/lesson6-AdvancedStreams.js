@@ -8,65 +8,28 @@ test('Merging', function() {
         .merge(me)
         .subscribe(function(a) { easy.push(a); });
 
-    // equals(easy === '1 A 2 B 3 C ' || easy === '1 2 3 A B C ', true/*_______*/);
+    // equals(easy === '1 A 2 B 3 C ' || easy === '1 2 3 A B C ', _______);
     
     // Actually, this is not so easy! The result could be any arbitrary
-    // riffle of the original two streams.  More later on Riffles in JS.
+    // riffle of the original two streams.  
 
     riffles([1, 2, 3].toEnumerable(), ['A', 'B', 'C'].toEnumerable())
         .forEach(function(riffle) {
             console.log("riffle: ", riffle.toArray());
         });
+    
     console.log("easy: ", easy);
 
-    equals( riffles([1, 2, 3].toEnumerable(), ['A', 'B', 'C'].toEnumerable())
+    equals(
+        riffles([1, 2, 3].toEnumerable(), ['A', 'B', 'C'].toEnumerable())
         .select(function (riffle) {return riffle.toArray();})
-        .contains(easy, arrayComparer),
+        ._______(easy, arrayComparer),
         true);
-
-
 });
-
-// Given a 1-based index n, produces a function that will pluck the n-th
-// item from any Enumerable and return it. Pluck produces a function so
-// that it can be mapped over Enumerables of Enumerables, say to produce
-// a columnar slice from an array.  WARNING: these are 1-based indices!
-var pluck = function (n) {
-    return function(xs) {
-        if (n <= 0 || n > xs.count)
-            throw new Error('index out of range');
-        return xs.elementAt(n - 1);
-    };
-};
-
-// Given a 1-based index n, produces a function that will produce an 
-// Enumerable with the n-th item missing.  WARNING: these are 1-based
-// indices!
-var coPluck = function(n) {
-    return function(xs) {
-
-        // is the following error-checking redundant?  The error-handling 
-        // policy of Ix is not clear to me at this point! (4 Nov 12)
-
-        // if (! (xs instanceof Ix.Enumerable) )
-        //     throw new Error('xs must be an Ix.Enumerable');
-        var c = xs.count();
-        if (n <= 0 || n > c)
-            throw new Error('index out of range');
-        var ys = [];
-        var i = 1;
-        xs.forEach( function (x) {
-            if (i != n)
-                ys.push(x);
-            i++;
-        });
-        return ys.toEnumerable();
-    };
-};    
 
 // A function that compares arrays for equality given an optional
 // elementComparer. Be aware that this is not sufficiently flexible 
-// to work on arrayw of arbitrary nesting.
+// to work on arrays of arbitrary nesting.
 var arrayComparer = function (xs, ys, elementComparer) {
     if ( (! (xs instanceof Array)) || (! (ys instanceof Array)) )
         return false;
@@ -89,10 +52,7 @@ var splits = function(xs) {
     var c = xs.count();
     var ys = [];
     for (var i = 0; i <= c; i++)
-        // ys.push( [xs.take(i), xs.skip(i)].toEnumerable() );
-        ys.push( [xs.take(i).toArray().slice(0).toEnumerable(),
-                  xs.skip(i).toArray().slice(0).toEnumerable()]
-             .toEnumerable() );
+        ys.push( [xs.take(i), xs.skip(i)].toEnumerable() );
     return ys.toEnumerable();
 };
 
@@ -114,37 +74,6 @@ var riffles = function(left, right) {
     return ys.toEnumerable();                                           
 };
 
-test('Riffles', function() {
-    var e = [1, 2, 3].toEnumerable();
-
-    equals(e.contains(2), true);
-    equals(e.count(), 3);
-    equals([[1, 2], [3, 4]].toEnumerable().contains([3, 4], arrayComparer), true);
-
-    e.forEach(function (x) { equals( pluck(x)(e), x ); });
-    
-    // Expecting exceptions to be thrown
-    try { pluck(0)(e); equals(false, true); }
-    catch (exception) { equals(true, true); }
-
-    try { pluck(4)(e); equals(false, true); }
-    catch (exception) { equals(true, true); }
-    
-    try { pluck(-2)(e); equals(false, true); }
-    catch (exception) { equals(true, true); }
-
-    equals( arrayComparer(coPluck(2)(e).toArray(), [1, 3]), true );
-
-    equals( arrayComparer(riffles(e, Ix.Enumerable.empty()).first().toArray(),
-                          e.toArray()), true);
-    equals( arrayComparer(riffles(Ix.Enumerable.empty(), e).first().toArray(),
-                          e.toArray()), true);
-    equals( riffles([1,2,3].toEnumerable(), [4,5,6].toEnumerable())
-        .select(function (riffle) {return riffle.toArray();})
-        .contains([1,2,4,5,3,6], arrayComparer),
-        true);
-});
-
 var floatingEquals = function (a, b, digits) {
     var exponent = Math.abs( digits || 12 );
     var multiplier = Math.pow(10, exponent);
@@ -153,7 +82,7 @@ var floatingEquals = function (a, b, digits) {
 
 test('DescriptiveStatistics', function () {
     var e = [1, 2, 3].toEnumerable();
-    equals(e.standardDeviation(), 1);
+    equals(e.standardDeviation(), _______);
 
     equals(floatingEquals(
         [1, 2].toEnumerable().standardDeviation(),
@@ -185,7 +114,7 @@ test('Splitting Up', function() {
     var oddsAndEvens = ['',''];
         numbers = Rx.Observable.range(1, 9),
         split = numbers
-            .groupBy(function(n) { return n % 2 /*_______*/; });
+            .groupBy(function(n) { return n % _______; });
 
     split.subscribe(function (g) {
         console.log(g, "key: ", g.key);
@@ -218,7 +147,7 @@ test('Subscribe Imediately When Splitting', function() {
         .subscribe(function(g) {
             g
                 .average()
-                .subscribe/*_______*/(function(a) { averages[g.key] = a; });
+                ._______(function(a) { averages[g.key] = a; });
     });
     equals(22, averages[0]);
     equals(100, averages[1]);
@@ -253,7 +182,9 @@ test('Multiple Subscriptions', function() {
     numbers.onCompleted();
 
     equals(sum, 15);
-    equals(average, 2/*_______*/);
+    equals(average, _______);
 });
+
+
 
 
