@@ -188,10 +188,9 @@ test('Splitting Up', function() {
             .groupBy(function(n) { return n % 2 /*_______*/; });
 
     split.subscribe(function (g) {
-        console.log(g, "key: ", g.key);
         return g.subscribe(
             function (i) {
-                return console.log(i);
+                return console.log(i, g.key);
             });
         });
 
